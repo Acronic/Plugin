@@ -38,11 +38,10 @@ namespace RadsProfileManager
         // All my variables used throughout the plugin
         public static DateTime _lastLooked = DateTime.Now;
         public static string iName = "RadsProfileManager beta";
-        private static bool isLeaving;
-        private static bool gameStarted;
-        public static int dcount;
+        private static int dcount = 0;
         public const int dtrip = 3;
         public static string startpname = "";
+
         // If they enable the plugin
         void IPlugin.OnEnabled()
         {
@@ -75,6 +74,12 @@ namespace RadsProfileManager
             OkClicker();
         }
 
+        void IPlugin.OnShutdown()
+        {
+        }
+
+        //Functions here
+
         public static void OkClicker()
         {
             if (DateTime.Now.Subtract(_lastLooked).TotalSeconds > 3)
@@ -89,12 +94,8 @@ namespace RadsProfileManager
                         Log("Clicking OK.");
                         Button.Click();
                     }
-                }  
+                }
             }
-        }
-
-        void IPlugin.OnShutdown()
-        {
         }
 
         static void HandleBotStop(IBot bot)
@@ -116,14 +117,14 @@ namespace RadsProfileManager
         static void OnPlayerDied(object sender, EventArgs e)
         {
             string lastp = GlobalSettings.Instance.LastProfile;
-            if(dcount != dtrip)
+            if (dcount <= dtrip)
             {
                 Log("You died, reload profile so you can try again.");
                 ProfileManager.Load(lastp);
                 dcount = dcount + 1;
                 Log("Deathcount: " + dcount);
             }
-            if(dcount == dtrip)
+            else
             {
                 Log("You died, reload profile so you can try again.");
                 ProfileManager.Load(startpname);
@@ -133,9 +134,11 @@ namespace RadsProfileManager
 
         private static void OnGameJoined(object src, EventArgs mea)
         {
-            Log("Joined Game.");
-            dcount = dcount - dcount;
+            dcount = 0;
+            Log("Joined Game, reset death count to " + dcount);
         }
+
+        //XmlElement here
 
         [XmlElement("Continue")]
         public class ContinueTag : ProfileBehavior
@@ -173,7 +176,8 @@ namespace RadsProfileManager
                         else
                         {
                             Log("Been asked to load a new profile, which is " + ProfileName);
-                            dcount = dcount - dcount;
+                            dcount = 0;
+                            Log("Reset death count to " + dcount);
                             ProfileManager.Load(nextProfile);
                         }
                     }
