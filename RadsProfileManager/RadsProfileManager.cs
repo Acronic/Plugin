@@ -4,11 +4,11 @@ using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Xml;
 using Zeta;
 using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.CommonBot;
-using Zeta.CommonBot.Logic;
 using Zeta.CommonBot.Profile;
 using Zeta.CommonBot.Settings;
 using Zeta.Internals;
@@ -22,7 +22,7 @@ namespace RadsProfileManager
     public class RadsProfileManager : IPlugin
     {
         // Stuff Db needs to make this a plugin
-        public Version Version { get { return new Version(0, 4); } }
+        public Version Version { get { return new Version(0, 5, 1); } }
         public string Author { get { return "Radonic"; } }
         public string Description { get { return "Restarting Radonics leveling profiles. Clicking OK on different buttons. Still in beta."; } }
         public string Name { get { return "RadsProfileManager beta"; } }
@@ -36,31 +36,33 @@ namespace RadsProfileManager
         }
 
         // All my variables used throughout the plugin
-        public static DateTime _lastLooked = DateTime.Now;
-        public static string iName = "RadsProfileManager beta";
+        private static DateTime _lastLooked = DateTime.Now;
+        private static string iName = "RadsProfileManager beta";
         private static int dcount = 0;
-        public const int dtrip = 3;
-        public static string startpname = "";
+        private const int dtrip = 2;
+        private const int dtripnxt = 3;
+        private static string startpname = "";
+        private static string databaseConnStr = "";
 
         // If they enable the plugin
         void IPlugin.OnEnabled()
         {
-            GameEvents.OnGameJoined += OnGameJoined;
-            GameEvents.OnGameLeft += OnGameLeft;
-            GameEvents.OnPlayerDied += OnPlayerDied;
-            BotMain.OnStop += HandleBotStop;
-            BotMain.OnStart += HandleBotStart;
+            GameEvents.OnGameJoined += RadsOnGameJoined;
+            GameEvents.OnGameLeft += RadsOnGameLeft;
+            GameEvents.OnPlayerDied += RadsOnPlayerDied;
+            BotMain.OnStop += RadsHandleBotStop;
+            BotMain.OnStart += RadsHandleBotStart;
             Log("Enabled.");
         }
 
         // If they disable the plugin
         void IPlugin.OnDisabled()
         {
-            GameEvents.OnGameJoined -= OnGameJoined;
-            GameEvents.OnGameLeft -= OnGameLeft;
-            GameEvents.OnPlayerDied -= OnPlayerDied;
-            BotMain.OnStop -= HandleBotStop;
-            BotMain.OnStart -= HandleBotStart;
+            GameEvents.OnGameJoined -= RadsOnGameJoined;
+            GameEvents.OnGameLeft -= RadsOnGameLeft;
+            GameEvents.OnPlayerDied -= RadsOnPlayerDied;
+            BotMain.OnStop -= RadsHandleBotStop;
+            BotMain.OnStart -= RadsHandleBotStart;
             Log("Disabled.");
         }
 
@@ -82,7 +84,7 @@ namespace RadsProfileManager
 
         public static void OkClicker()
         {
-            if (DateTime.Now.Subtract(_lastLooked).TotalSeconds > 3)
+            if (DateTime.Now.Subtract(_lastLooked).TotalSeconds > 5)
             {
                 _lastLooked = DateTime.Now;
                 UIElement Warning = UIElement.FromHash(0xF9E7B8A635A4F725);
@@ -93,46 +95,68 @@ namespace RadsProfileManager
                     {
                         Log("Clicking OK.");
                         Button.Click();
+                        Thread.Sleep(3000);
                     }
                 }
             }
         }
 
-        static void HandleBotStop(IBot bot)
+        static void RadsHandleBotStop(IBot bot)
         {
             string lastpname = Path.GetFileName(GlobalSettings.Instance.LastProfile);
             Log("Last profile used was " + lastpname + ".");
         }
 
-        public static void HandleBotStart(IBot bot)
+        public static void RadsHandleBotStart(IBot bot)
         {
             startpname = GlobalSettings.Instance.LastProfile;
             Log("Starter profile is " + startpname + ".");
         }
 
-        static void OnGameLeft(object sender, EventArgs e)
+        static void RadsOnGameLeft(object sender, EventArgs e)
         {
         }
 
-        static void OnPlayerDied(object sender, EventArgs e)
+        static void RadsOnPlayerDied(object sender, EventArgs e)
         {
             string lastp = GlobalSettings.Instance.LastProfile;
-            if (dcount <= dtrip)
+            dcount = dcount + 1;
+            if (dcount < dtrip)
             {
                 Log("You died, reload profile so you can try again.");
-                ProfileManager.Load(lastp);
-                dcount = dcount + 1;
                 Log("Deathcount: " + dcount);
+                ProfileManager.Load(lastp);
+                Thread.Sleep(1000);
+            }
+            else if (dcount < dtripnxt)
+            {
+                StreamReader stRd = new StreamReader(lastp);
+                XmlTextReader xmlRd = new XmlTextReader(stRd);
+                XmlDocument rdXml = new XmlDocument();
+                rdXml.Load(xmlRd);
+                XmlNode connNode = rdXml.SelectSingleNode("Profile/Order/Continue");
+                if (connNode != null && connNode.Attributes != null)
+                {
+                    databaseConnStr = connNode.Attributes.GetNamedItem("profile").Value;
+                    string ppath = Path.GetDirectoryName(lastp);
+                    string nxtp = ppath + "\\" + databaseConnStr;
+                    ProfileManager.Load(nxtp);
+                    Thread.Sleep(1000);
+                    Log("Died twice, will move on to next profile " + nxtp);
+                    Log("Deathcount: " + dcount);
+                }
             }
             else
             {
                 Log("You died, reload profile so you can try again.");
                 ProfileManager.Load(startpname);
+                Thread.Sleep(1000);
                 ZetaDia.Service.Games.LeaveGame();
+                Thread.Sleep(1000);
             }
         }
 
-        private static void OnGameJoined(object src, EventArgs mea)
+        private static void RadsOnGameJoined(object src, EventArgs mea)
         {
             dcount = 0;
             Log("Joined Game, reset death count to " + dcount);
@@ -157,19 +181,19 @@ namespace RadsProfileManager
             public string ExitGame { get; set; }
 
 
-            protected override Zeta.TreeSharp.Composite CreateBehavior()
+            protected override Composite CreateBehavior()
             {
                 return new Zeta.TreeSharp.Action((ret) =>
                 {
                     string lastp = GlobalSettings.Instance.LastProfile;
                     string ppath = Path.GetDirectoryName(lastp);
-                    string nextProfile = ppath + "\\" + ProfileName;
+                    string nxtp = ppath + "\\" + ProfileName;
                     if (ProfileName != null)
                     {
                         if (ExitGame != null)
                         {
                             Log("Been asked to load a new profile, which is " + ProfileName);
-                            ProfileManager.Load(nextProfile);
+                            ProfileManager.Load(nxtp);
                             BotMain.PauseWhile(() => ZetaDia.IsInGame || ZetaDia.IsLoadingWorld, 8);
                             ZetaDia.Service.Games.LeaveGame();  
                         }
@@ -178,7 +202,7 @@ namespace RadsProfileManager
                             Log("Been asked to load a new profile, which is " + ProfileName);
                             dcount = 0;
                             Log("Reset death count to " + dcount);
-                            ProfileManager.Load(nextProfile);
+                            ProfileManager.Load(nxtp);
                         }
                     }
                     else
