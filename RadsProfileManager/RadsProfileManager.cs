@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,6 +11,7 @@ using Zeta.CommonBot;
 using Zeta.CommonBot.Profile;
 using Zeta.CommonBot.Settings;
 using Zeta.Internals;
+using Zeta.Internals.Actors;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 using UIElement = Zeta.Internals.UIElement;
@@ -22,13 +22,18 @@ namespace RadsProfileManager
     public class RadsProfileManager : IPlugin
     {
         // Stuff Db needs to make this a plugin
-        public Version Version { get { return new Version(0, 5, 1); } }
+        public Version Version { get { return new Version(0, 6, 2); } }
         public string Author { get { return "Radonic"; } }
         public string Description { get { return "Restarting Radonics leveling profiles. Clicking OK on different buttons. Still in beta."; } }
         public string Name { get { return "RadsProfileManager beta"; } }
         public bool Equals(IPlugin other) { return (other.Name == Name) && (other.Version == Version); }
-        public Window DisplayWindow { get { return null; } }
-
+        public Window DisplayWindow
+        {
+            get
+            {
+                return null;
+            }
+        }
         // Custom logger to stamp logs with plugin name & version first
         public static void Log(string message)
         {
@@ -37,12 +42,16 @@ namespace RadsProfileManager
 
         // All my variables used throughout the plugin
         private static DateTime _lastLooked = DateTime.Now;
-        private static string iName = "RadsProfileManager beta";
+        private const string iName = "RadsProfileManager beta";
         private static int dcount = 0;
         private const int dtrip = 2;
         private const int dtripnxt = 3;
         private static string startpname = "";
+        private static string joinpname = "";
         private static string databaseConnStr = "";
+        private static DateTime lastDiedTime = DateTime.Today;
+        private static bool bAlreadyHandledDeathPortal = true;
+        private static bool bWasVendoringAfterDeath = false;
 
         // If they enable the plugin
         void IPlugin.OnEnabled()
@@ -73,8 +82,43 @@ namespace RadsProfileManager
 
         void IPlugin.OnPulse()
         {
-            OkClicker();
+            // Check we don't spam onpulse too often - once every 5 seconds is enough
+            if (DateTime.Now.Subtract(_lastLooked).TotalSeconds > 5)
+            {
+                _lastLooked = DateTime.Now;
+                // Call the OKClicker
+                OkClicker();
+                // Check for death handling and town portalling
+                if (!bAlreadyHandledDeathPortal && DateTime.Now.Subtract(lastDiedTime).TotalSeconds > 8)
+                {
+                    // Flag up if we were in the middle of vendoring
+                    if (Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
+                    {
+                        bWasVendoringAfterDeath = true;
+                    }
+                    else if (bWasVendoringAfterDeath)
+                    {
+                        // If we reach here, then we WERE vendoring, but AREN'T vendoring any more
+                        if (!ZetaDia.Me.IsInTown)
+                        {
+                            ZetaDia.Me.UsePower(SNOPower.UseStoneOfRecall, Vector3.Zero, ZetaDia.Me.WorldDynamicId, -1);
+                        }
+                        string lunstuckp = GlobalSettings.Instance.LastProfile;
+                        ProfileManager.Load(lunstuckp);
+                        bAlreadyHandledDeathPortal = true;
+                        bWasVendoringAfterDeath = false;
+                        Thread.Sleep(3000);
+                    }
+                    // Safety cancel this check after 2 minutes after death "Just incase"
+                    if (DateTime.Now.Subtract(lastDiedTime).TotalSeconds > 120)
+                    {
+                        bAlreadyHandledDeathPortal = true;
+                        bWasVendoringAfterDeath = false;
+                    }
+                }
+            }
         }
+
 
         void IPlugin.OnShutdown()
         {
@@ -84,25 +128,22 @@ namespace RadsProfileManager
 
         public static void OkClicker()
         {
-            if (DateTime.Now.Subtract(_lastLooked).TotalSeconds > 5)
+            UIElement warning = UIElement.FromHash(0xF9E7B8A635A4F725);
+            if (warning.IsValid && warning.IsVisible)
             {
-                _lastLooked = DateTime.Now;
-                UIElement Warning = UIElement.FromHash(0xF9E7B8A635A4F725);
-                if (Warning.IsValid && Warning.IsVisible)
+                UIElement button = UIElement.FromHash(0x891D21408238D18E);
+                if (button.IsValid && button.IsVisible && button.IsEnabled)
                 {
-                    UIElement Button = UIElement.FromHash(0x891D21408238D18E);
-                    if (Button.IsValid && Button.IsVisible && Button.IsEnabled)
-                    {
-                        Log("Clicking OK.");
-                        Button.Click();
-                        Thread.Sleep(3000);
-                    }
+                    Log("Clicking OK.");
+                    button.Click();
+                    Thread.Sleep(3000);
                 }
             }
         }
 
         static void RadsHandleBotStop(IBot bot)
         {
+            startpname = "";
             string lastpname = Path.GetFileName(GlobalSettings.Instance.LastProfile);
             Log("Last profile used was " + lastpname + ".");
         }
@@ -119,6 +160,14 @@ namespace RadsProfileManager
 
         static void RadsOnPlayerDied(object sender, EventArgs e)
         {
+            // First of all check that DB isn't spamming the death event incase it causes bugs
+            if (DateTime.Now.Subtract(lastDiedTime).TotalSeconds <= 4)
+                return;
+            // Now record this time of death
+            lastDiedTime = DateTime.Now;
+            bWasVendoringAfterDeath = false;
+            bAlreadyHandledDeathPortal = false;
+            // Now do stuff based on death counts
             string lastp = GlobalSettings.Instance.LastProfile;
             dcount = dcount + 1;
             if (dcount < dtrip)
@@ -140,7 +189,16 @@ namespace RadsProfileManager
                     databaseConnStr = connNode.Attributes.GetNamedItem("profile").Value;
                     string ppath = Path.GetDirectoryName(lastp);
                     string nxtp = ppath + "\\" + databaseConnStr;
-                    ProfileManager.Load(nxtp);
+                    if (databaseConnStr == joinpname)
+                    {
+                        ProfileManager.Load(joinpname);
+                        Thread.Sleep(1000);
+                        ZetaDia.Service.Games.LeaveGame();
+                    }
+                    else
+                    {
+                        ProfileManager.Load(nxtp);
+                    }
                     Thread.Sleep(1000);
                     Log("Died twice, will move on to next profile " + nxtp);
                     Log("Deathcount: " + dcount);
@@ -160,6 +218,7 @@ namespace RadsProfileManager
         {
             dcount = 0;
             Log("Joined Game, reset death count to " + dcount);
+            joinpname = Path.GetFileName(GlobalSettings.Instance.LastProfile);
         }
 
         //XmlElement here
@@ -190,20 +249,16 @@ namespace RadsProfileManager
                     string nxtp = ppath + "\\" + ProfileName;
                     if (ProfileName != null)
                     {
-                        if (ExitGame != null)
+                        Log("Been asked to load a new profile, which is " + ProfileName);
+                        ProfileManager.Load(nxtp);
+                        dcount = 0;
+                        Log("Reset death count to " + dcount + ".");
+                        if (ProfileName == joinpname)
                         {
-                            Log("Been asked to load a new profile, which is " + ProfileName);
-                            ProfileManager.Load(nxtp);
-                            BotMain.PauseWhile(() => ZetaDia.IsInGame || ZetaDia.IsLoadingWorld, 8);
-                            ZetaDia.Service.Games.LeaveGame();  
+                            ZetaDia.Service.Games.LeaveGame();
+                            Log("Run is over, leaving game.");
                         }
-                        else
-                        {
-                            Log("Been asked to load a new profile, which is " + ProfileName);
-                            dcount = 0;
-                            Log("Reset death count to " + dcount);
-                            ProfileManager.Load(nxtp);
-                        }
+                        Thread.Sleep(1000);
                     }
                     else
                     {
