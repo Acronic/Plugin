@@ -22,7 +22,7 @@ namespace RadsProfileManager
     public class RadsProfileManager : IPlugin
     {
         // Stuff Db needs to make this a plugin
-        public Version Version { get { return new Version(0, 6, 2); } }
+        public Version Version { get { return new Version(0, 7, 2); } }
         public string Author { get { return "Radonic"; } }
         public string Description { get { return "Restarting Radonics leveling profiles. Clicking OK on different buttons. Still in beta."; } }
         public string Name { get { return "RadsProfileManager beta"; } }
@@ -41,7 +41,7 @@ namespace RadsProfileManager
         }
 
         // All my variables used throughout the plugin
-        private static DateTime _lastLooked = DateTime.Now;
+        private static DateTime lastlooked = DateTime.Now;
         private const string iName = "RadsProfileManager beta";
         private static int dcount = 0;
         private const int dtrip = 2;
@@ -52,6 +52,8 @@ namespace RadsProfileManager
         private static DateTime lastDiedTime = DateTime.Today;
         private static bool bAlreadyHandledDeathPortal = true;
         private static bool bWasVendoringAfterDeath = false;
+        private static bool bRandomProfile = false;
+        private static bool bOKClicker = false;
 
         // If they enable the plugin
         void IPlugin.OnEnabled()
@@ -83,11 +85,14 @@ namespace RadsProfileManager
         void IPlugin.OnPulse()
         {
             // Check we don't spam onpulse too often - once every 5 seconds is enough
-            if (DateTime.Now.Subtract(_lastLooked).TotalSeconds > 5)
+            if (DateTime.Now.Subtract(lastlooked).TotalSeconds > 5)
             {
-                _lastLooked = DateTime.Now;
+                lastlooked = DateTime.Now;
                 // Call the OKClicker
-                OkClicker();
+                if (bOKClicker)
+                {
+                    OkClicker();
+                }
                 // Check for death handling and town portalling
                 if (!bAlreadyHandledDeathPortal && DateTime.Now.Subtract(lastDiedTime).TotalSeconds > 8)
                 {
@@ -194,6 +199,10 @@ namespace RadsProfileManager
                         ProfileManager.Load(joinpname);
                         Thread.Sleep(1000);
                         ZetaDia.Service.Games.LeaveGame();
+                        if (! ZetaDia.Me.IsInTown)
+                        {
+                            Thread.Sleep(10000);
+                        }
                     }
                     else
                     {
@@ -210,6 +219,10 @@ namespace RadsProfileManager
                 ProfileManager.Load(startpname);
                 Thread.Sleep(1000);
                 ZetaDia.Service.Games.LeaveGame();
+                if (!ZetaDia.Me.IsInTown)
+                {
+                    Thread.Sleep(10000);
+                }
                 Thread.Sleep(1000);
             }
         }
@@ -236,36 +249,93 @@ namespace RadsProfileManager
             [XmlAttribute("profile")]
             public string ProfileName { get; set; }
 
-            [XmlAttribute("exitgame")]
-            public string ExitGame { get; set; }
+            [XmlAttribute("profileB")]
+            public string ProfileNameB { get; set; }
 
 
             protected override Composite CreateBehavior()
             {
                 return new Zeta.TreeSharp.Action((ret) =>
                 {
-                    string lastp = GlobalSettings.Instance.LastProfile;
-                    string ppath = Path.GetDirectoryName(lastp);
-                    string nxtp = ppath + "\\" + ProfileName;
-                    if (ProfileName != null)
+                    if (bRandomProfile)
                     {
-                        Log("Been asked to load a new profile, which is " + ProfileName);
-                        ProfileManager.Load(nxtp);
-                        dcount = 0;
-                        Log("Reset death count to " + dcount + ".");
-                        if (ProfileName == joinpname)
+                        if (ProfileName != null)
                         {
-                            ZetaDia.Service.Games.LeaveGame();
-                            Log("Run is over, leaving game.");
+                            if (ProfileNameB != null)
+                            {
+                                string lastp = GlobalSettings.Instance.LastProfile;
+                                string ppath = Path.GetDirectoryName(lastp);
+                                string nxtp = ppath + "\\" + ProfileName;
+                                string nxtpB = ppath + "\\" + ProfileNameB;
+                                Random random = new Random();
+                                int ircount = random.Next(10);
+                                if (ircount < 5)
+                                {
+                                    Log("Been asked to load a new profile, which is " + ProfileName);
+                                    ProfileManager.Load(nxtp);
+                                    dcount = 0;
+                                    Log("Reset death count to " + dcount + ".");
+                                    if (ProfileName == joinpname)
+                                    {
+                                        ZetaDia.Service.Games.LeaveGame();
+                                        Log("Run is over, leaving game.");
+                                    }
+                                    Thread.Sleep(1000);
+                                }
+                                else
+                                {
+                                    Log("Been asked to load a new profile, which is " + ProfileNameB);
+                                    ProfileManager.Load(nxtpB);
+                                    dcount = 0;
+                                    Log("Reset death count to " + dcount + ".");
+                                    if (ProfileNameB == joinpname)
+                                    {
+                                        ZetaDia.Service.Games.LeaveGame();
+                                        Log("Run is over, leaving game.");
+                                    }
+                                    Thread.Sleep(1000);
+                                }
+                                m_IsDone = true;
+                            }
+                            else
+                            {
+                                Log("DEBUG: No next profileB selected in the profile, stopping the bot.");
+                                BotMain.Stop();
+                            }
                         }
-                        Thread.Sleep(1000);
+                        else
+                        {
+                            Log("DEBUG: No next profile selected in the profile, stopping the bot.");
+                            BotMain.Stop();
+                        }
                     }
                     else
                     {
-                        Log("No profile selected, stopping the bot.");
-                        BotMain.Stop();
+                        string lastp = GlobalSettings.Instance.LastProfile;
+                        string ppath = Path.GetDirectoryName(lastp);
+                        string nxtp = ppath + "\\" + ProfileName;
+                        if (ProfileName != null)
+                        {
+                            Log("Been asked to load a new profile, which is " + ProfileName);
+                            ProfileManager.Load(nxtp);
+                            dcount = 0;
+                            Log("Reset death count to " + dcount + ".");
+                            if (ProfileName == joinpname)
+                            {
+                                Thread.Sleep(1000);
+                                ZetaDia.Service.Games.LeaveGame();
+                                Log("Run is over, leaving game.");
+                                Thread.Sleep(2000);
+                            }
+                            Thread.Sleep(1000);
+                        }
+                        else
+                        {
+                            Log("DEBUG: No next profile selected in the profile, stopping the bot.");
+                            BotMain.Stop();
+                        }
+                        m_IsDone = true;
                     }
-                    m_IsDone = true;
                 });
             }
 
