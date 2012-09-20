@@ -1,0 +1,46 @@
+﻿<UserControl 
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" Height="300" Width="300" Name="mainControl">
+    <Grid>
+        <TabControl Height="276" HorizontalAlignment="Left" Margin="12,12,0,0" Name="tabControl1" VerticalAlignment="Top" Width="276">
+            <TabItem Header="General" Name="tabGeneral">
+                <Grid>
+                    <GroupBox Header="Next Profile" Height="63" HorizontalAlignment="Left" Margin="31,163,0,0" Name="groupBox1" VerticalAlignment="Top" Width="90">
+                        <Grid>
+                            <TextBox Height="28" HorizontalAlignment="Left" Margin="6,6,0,0" Name="textBox_nextprofile" VerticalAlignment="Top" Width="66" />
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Header="Leave Game" Height="63" HorizontalAlignment="Left" Margin="142,163,0,0" Name="groupBox2" VerticalAlignment="Top" Width="90">
+                        <Grid>
+                            <TextBox Height="28" HorizontalAlignment="Left" Margin="6,6,0,0" Name="textBox_leavegame" VerticalAlignment="Top" Width="66" />
+                        </Grid>
+                    </GroupBox>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Relogger" Name="tabRelogger">
+                <Grid>
+                    <CheckBox Content="Enable Relogger" Height="16" HorizontalAlignment="Left" Margin="79,47,0,0" Name="checkBox_enablerelogger" VerticalAlignment="Top" />
+                    <TextBox Height="23" HorizontalAlignment="Left" Margin="140,71,0,0" Name="textBox_bnusername" VerticalAlignment="Top" Width="120" />
+                    <TextBox Height="23" HorizontalAlignment="Left" Margin="140,100,0,0" Name="textBox_bnpassword" VerticalAlignment="Top" Width="120" />
+                    <Label Content="Battle.net Username:" Height="28" HorizontalAlignment="Left" Margin="6,69,0,0" Name="label1" VerticalAlignment="Top" />
+                    <Label Content="Battle.net Password:" Height="28" HorizontalAlignment="Left" Margin="6,98,0,0" Name="label2" VerticalAlignment="Top" />
+                    <ProgressBar Height="13" HorizontalAlignment="Left" Margin="47,0,0,32" Name="progressBar1" VerticalAlignment="Bottom" Width="176" />
+                    <TextBox Height="29" HorizontalAlignment="Left" Margin="47,129,0,0" Name="textBox_serial" VerticalAlignment="Top" Width="176" TextAlignment="Center" FontSize="14" IsReadOnly="True" />
+                    <TextBox Height="29" HorizontalAlignment="Left" Margin="47,164,0,0" Name="textBox_code" TextAlignment="Center" VerticalAlignment="Top" Width="176" FontSize="14" IsReadOnly="True" />
+                    <Button Content="Enroll" Height="20" HorizontalAlignment="Left" Margin="33,218,0,0" Name="button_enroll" VerticalAlignment="Top" Width="75" />
+                    <Button Content="Restore" Height="20" HorizontalAlignment="Left" Margin="161,218,0,0" Name="button_restore" VerticalAlignment="Top" Width="75" />
+                    <TextBlock Height="40" HorizontalAlignment="Left" Margin="6,6,0,0" Name="textBlock1" Text="When enable the relogger for the first time you
+need to re enable the plugin for it to start." VerticalAlignment="Top" Width="254" />
+                </Grid>
+            </TabItem>
+            <TabItem Header="XML Settings" Name="tabXMLSettings">
+                <Grid>
+                    <CheckBox Content="Security Randomization" Height="16" HorizontalAlignment="Left" Margin="10,10,0,0" Name="checkBox_securityrandomization" VerticalAlignment="Top" />
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</UserControl>

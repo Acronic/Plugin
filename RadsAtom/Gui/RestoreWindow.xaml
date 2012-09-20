@@ -1,0 +1,28 @@
+﻿<UserControl 
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" Height="170" Width="300" Name="mainControl">
+    <Grid>
+        <Button Content="Restore" Height="23" HorizontalAlignment="Left" Margin="111,135,0,0" Name="button_restorerestore" VerticalAlignment="Top" Width="75" />
+        <GroupBox Header="Authenticator Serial" Height="56" HorizontalAlignment="Left" Margin="10,10,0,0" Name="groupBox1" VerticalAlignment="Top" Width="278">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="256*" />
+                    <ColumnDefinition Width="10*" />
+                </Grid.ColumnDefinitions>
+                <TextBox Height="23" HorizontalAlignment="Left" Margin="6,4,0,0" Name="textBox_restoreserial" VerticalAlignment="Top" Width="254" Grid.ColumnSpan="2" />
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Restore Code" Height="56" HorizontalAlignment="Left" Margin="10,66,0,0" Name="groupBox2" VerticalAlignment="Top" Width="278">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="256*" />
+                    <ColumnDefinition Width="10*" />
+                </Grid.ColumnDefinitions>
+                <TextBox Grid.ColumnSpan="2" Height="23" HorizontalAlignment="Left" Margin="6,4,0,0" Name="textBox_restorecode" VerticalAlignment="Top" Width="254" />
+            </Grid>
+        </GroupBox>
+    </Grid>
+</UserControl>
