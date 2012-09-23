@@ -94,12 +94,14 @@ namespace RadsAtom.Functions
                             string profile = profilepath + "\\" + newprofile;
                             if (isexitgame == "")
                             {
+                                Inactivty = false;
                                 Death.DeathReset();
                                 ProfileManager.Load(profile);
                                 Logger.Log("Loading next profile, stuck too long: " + profile);
                             }
                             else
                             {
+                                Inactivty = false;
                                 ProfileManager.Load(Settings.BackupProfile);
                                 Logger.Log("Leave game, last profile, stuck too long");
                                 Death.DeathReset();
@@ -114,6 +116,7 @@ namespace RadsAtom.Functions
                     }
                     catch (Exception ex)
                     {
+                        Inactivty = false;
                         Logger.LogDiag("Error: " + ex.ToString());
                     }
                 }
