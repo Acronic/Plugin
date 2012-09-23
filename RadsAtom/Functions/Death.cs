@@ -80,7 +80,6 @@ namespace RadsAtom.Functions
                     {
                         isexitgame = exitvar.Value;
                     }
-                    Logger.Log("test");
                     newprofiles = conNode.Attributes.GetNamedItem("profile").Value;
                     string profilepath = Path.GetDirectoryName(lastprofile);
                     char[] delimiters = new char[] { ',', ' ' };

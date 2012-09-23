@@ -8,14 +8,24 @@
         <TabControl Height="276" HorizontalAlignment="Left" Margin="12,12,0,0" Name="tabControl1" VerticalAlignment="Top" Width="276">
             <TabItem Header="General" Name="tabGeneral">
                 <Grid>
-                    <GroupBox Header="Next Profile" Height="63" HorizontalAlignment="Left" Margin="31,163,0,0" Name="groupBox1" VerticalAlignment="Top" Width="90">
-                        <Grid>
-                            <TextBox Height="28" HorizontalAlignment="Left" Margin="6,6,0,0" Name="textBox_nextprofile" VerticalAlignment="Top" Width="66" />
+                    <GroupBox Header="Death Handling" Height="153" HorizontalAlignment="Left" Margin="6,6,0,0" Name="groupBox3" VerticalAlignment="Top" Width="134">
+                        <Grid Height="132">
+                            <GroupBox Header="Next Profile" Height="63" HorizontalAlignment="Left" Margin="18,6,0,0" Name="groupBox1" VerticalAlignment="Top" Width="90">
+                                <Grid>
+                                    <TextBox Height="28" HorizontalAlignment="Left" Margin="6,6,0,0" Name="textBox_nextprofile" VerticalAlignment="Top" Width="66" />
+                                </Grid>
+                            </GroupBox>
+                            <GroupBox Header="Leave Game" Height="63" HorizontalAlignment="Left" Margin="18,69,0,0" Name="groupBox2" VerticalAlignment="Top" Width="90">
+                                <Grid>
+                                    <TextBox Height="28" HorizontalAlignment="Left" Margin="6,6,0,0" Name="textBox_leavegame" VerticalAlignment="Top" Width="66" />
+                                </Grid>
+                            </GroupBox>
                         </Grid>
                     </GroupBox>
-                    <GroupBox Header="Leave Game" Height="63" HorizontalAlignment="Left" Margin="142,163,0,0" Name="groupBox2" VerticalAlignment="Top" Width="90">
+                    <GroupBox Header="Inactivity Timer" Height="74" Margin="146,6,6,0" Name="groupBox4" VerticalAlignment="Top">
                         <Grid>
-                            <TextBox Height="28" HorizontalAlignment="Left" Margin="6,6,0,0" Name="textBox_leavegame" VerticalAlignment="Top" Width="66" />
+                            <Label Content="Minutes" Height="24" HorizontalAlignment="Left" Margin="25,0,0,0" Name="label3" VerticalAlignment="Top" />
+                            <TextBox Height="23" HorizontalAlignment="Left" Margin="34,22,0,0" Name="textBox_inactivtytime" VerticalAlignment="Top" Width="35" />
                         </Grid>
                     </GroupBox>
                 </Grid>

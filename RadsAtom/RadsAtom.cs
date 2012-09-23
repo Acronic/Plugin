@@ -25,7 +25,7 @@ namespace RadsAtom
         // IPlugin information
         public Version Version
         {
-            get { return new Version(1, 0); }
+            get { return new Version(1, 1); }
         }
 
         public string Author
@@ -144,6 +144,7 @@ namespace RadsAtom
             }
             AntiTownStuck.TownStuck();
             PortalStoneHelper.PortalStone();
+            Inactivitytimer.CheckMovement();
         }
 
         #endregion

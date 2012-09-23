@@ -6,9 +6,8 @@ using System.Text;
 using System.Xml;
 
 
-// Thanks Jorrit/sinterklaas
+// Thanks Jorrit/Sinterlkaas
 // All credit to him for this part of the plugin
-// I only made it work with RadsAtom
 
 namespace RadsAtom.Functions
 {

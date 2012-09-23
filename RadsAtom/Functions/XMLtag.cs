@@ -88,8 +88,10 @@ namespace RadsAtom.Functions
                                                                  Thread.Sleep(3000);
                                                              }
                                                              BExitGame = false;
-                                                             ZetaDia.Service.Games.LeaveGame();
+                                                             Logger.Log("Leaving the game.");
                                                              Thread.Sleep(1000);
+                                                             ZetaDia.Service.Games.LeaveGame();
+                                                             Thread.Sleep(2000);
                                                          }
 
                                                      }

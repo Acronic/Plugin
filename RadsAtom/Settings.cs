@@ -24,6 +24,7 @@ namespace RadsAtom
         public static bool EnableAggregator = false;
         public static bool AlreadyHandledDeathPortal = true;
         public static bool WasVendoringAfterDeath = false;
+        public static int Inactrip = 0;
 
 
         // Death Statement Tag
@@ -57,6 +58,7 @@ namespace RadsAtom
                 settingsWriter.WriteLine("BNetUser " + BNetUser.ToString());
                 settingsWriter.WriteLine("BNetPass " + BNetPass.ToString());
                 settingsWriter.WriteLine("UseSecurityRandomizer " + UseSecurityRandomizer.ToString());
+                settingsWriter.WriteLine("InactivityTime " + Inactrip.ToString());
             }
             settingsStream.Close();
             SavingSettings = false;
@@ -96,6 +98,9 @@ namespace RadsAtom
                                 break;
                             case "UseSecurityRandomizer":
                                 UseSecurityRandomizer = Convert.ToBoolean(settings[1]);
+                                break;
+                            case "InactivityTime":
+                                Inactrip = Convert.ToInt32(settings[1]);
                                 break;
                         }
                     }

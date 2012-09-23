@@ -70,7 +70,7 @@ namespace RadsAtom.Gui
         //----------------------------------------
         private Thread threadWorker;
         private CheckBox checkBox_enablerelogger, checkBox_securityrandomization;
-        private TextBox textBox_bnusername, textBox_bnpassword, textBox_serial, textBox_code, textBox_nextprofile, textBox_leavegame;
+        private TextBox textBox_bnusername, textBox_bnpassword, textBox_serial, textBox_code, textBox_nextprofile, textBox_leavegame, textBox_inactivtytime;
         private ProgressBar progressBar1;
         private Button button_enroll, button_restore;
 
@@ -108,6 +108,7 @@ namespace RadsAtom.Gui
             textBox_bnpassword = LogicalTreeHelper.FindLogicalNode(xamlContent, "textBox_bnpassword") as TextBox;
             textBox_nextprofile = LogicalTreeHelper.FindLogicalNode(xamlContent, "textBox_nextprofile") as TextBox;
             textBox_leavegame = LogicalTreeHelper.FindLogicalNode(xamlContent, "textBox_leavegame") as TextBox;
+            textBox_inactivtytime = LogicalTreeHelper.FindLogicalNode(xamlContent, "textBox_inactivtytime") as TextBox;
 
 
             // Button
@@ -158,6 +159,7 @@ namespace RadsAtom.Gui
             textBox_bnpassword.Text = Settings.BNetPass;
             textBox_nextprofile.Text = Settings.deathtrip.ToString();
             textBox_leavegame.Text = Settings.deathtrip2.ToString();
+            textBox_inactivtytime.Text = Settings.Inactrip.ToString();
             threadWorker = new Thread(new ThreadStart(Worker));
             threadWorker.SetApartmentState(ApartmentState.STA);
             threadWorker.Start();
@@ -168,8 +170,10 @@ namespace RadsAtom.Gui
         {
             string np = textBox_nextprofile.Text;
             string lg = textBox_leavegame.Text;
+            string it = textBox_inactivtytime.Text;
             Settings.deathtrip = int.Parse(np);
             Settings.deathtrip2 = int.Parse(lg);
+            Settings.Inactrip = int.Parse(it);
             Settings.BNetUser = textBox_bnusername.Text;
             Settings.BNetPass = textBox_bnpassword.Text;
             AuthenticatorSettings.Instance.BnetUsername = Settings.BNetUser;
@@ -238,7 +242,7 @@ namespace RadsAtom.Gui
             UserControl mainControl = LogicalTreeHelper.FindLogicalNode(xamlContent, "mainControl") as UserControl;
             enrollwindow.Content = xamlContent;
             enrollwindow.Title = "Enroll new Authenticator";
-            enrollwindow.Height = mainControl.Height;
+            enrollwindow.Height = mainControl.Height + 30;
             enrollwindow.Width = mainControl.Width + 30;
             enrollwindow.Closed += enrollwindow_Closed;
             enrollwindow.Loaded += enrollwindow_Loaded;
@@ -291,7 +295,7 @@ namespace RadsAtom.Gui
             DependencyObject xamlContent = XamlReader.Load(xamlStream.BaseStream) as DependencyObject;
             UserControl mainControl = LogicalTreeHelper.FindLogicalNode(xamlContent, "mainControl") as UserControl;
             restoreWindow.Content = xamlContent;
-            restoreWindow.Height = mainControl.Height;
+            restoreWindow.Height = mainControl.Height + 30;
             restoreWindow.Width = mainControl.Width + 30;
             restoreWindow.Title = "Restore Authenticator";
 

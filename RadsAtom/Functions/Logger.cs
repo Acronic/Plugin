@@ -20,6 +20,11 @@ namespace RadsAtom.Functions
         {
             Logging.Write("[{0}] - {1}", "Profile", msg);
         }
+
+        public static void LogDiag(string msg)
+        {
+            Logging.WriteDiagnostic(string.Format("[{0}] - {1}", RadsAtom.PName, msg));
+        }
     }
 
     [XmlElement("Logmsg")]
