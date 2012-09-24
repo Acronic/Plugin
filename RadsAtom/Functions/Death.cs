@@ -16,6 +16,7 @@ namespace RadsAtom.Functions
         public static int Count = 0;
         private static bool ownCount = false;
         public static DateTime whileDeadWait = DateTime.Today;
+        public static DateTime lastCount = DateTime.Today;
         private static string isexitgame = "";
         private static string newprofiles = "";
         private static string newprofile = "";
@@ -41,10 +42,11 @@ namespace RadsAtom.Functions
         // It will then add counter and execute DeathEvent to reload profile
         public static void DeathCount()
         {
-            if (ownCount)
+            if (ownCount && DateTime.Now.Subtract(lastCount).TotalSeconds > 5+Count)
             {
                 ownCount = false;
                 Count++;
+                lastCount = DateTime.Now;
                 Logger.Log("Released at: " + whileDeadWait);
                 Logger.Log("Deathcount at: " + Count);
                 if (Settings.DSinuse)
@@ -143,11 +145,13 @@ namespace RadsAtom.Functions
         {
             if (Settings.DSinuse)
             {
-                if (Count == Settings.DSdeathtrip)
+                if (Count > Settings.DSdeathtrip)
                 {
                     string lastprofile = GlobalSettings.Instance.LastProfile;
                     string path = Path.GetDirectoryName(lastprofile);
                     string DSprofile = path + Settings.DSBackupProfile;
+                    DeathReset();
+                    Settings.DSinuse = false;
                     if (Settings.DSaction == "nextprofile")
                     {
                         ProfileManager.Load(DSprofile);
@@ -156,7 +160,6 @@ namespace RadsAtom.Functions
                     else if (Settings.DSaction == "leave")
                     {
                         ProfileManager.Load(DSprofile);
-                        DeathReset();
                         ZetaDia.Service.Games.LeaveGame();
                         Logger.Log("Leave game, died too much.");
                         if (!ZetaDia.Me.IsInTown)

@@ -122,7 +122,7 @@ namespace RadsAtom
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex.Message);
+                    Logger.LogDiag(ex.Message);
                 }
             }
         }
@@ -137,14 +137,14 @@ namespace RadsAtom
 
         public void OnPulse()
         {
-            // Check if ingame and check if it should count a death.
-            if (Settings.ingamecheck && ZetaDia.IsInGame)
+            // Check if ingame and check if its not in a Loadingscreen.
+            if (Settings.ingamecheck && ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld)
             {
                 Death.DeathCount();
+                AntiTownStuck.TownStuck();
+                PortalStoneHelper.PortalStone();
+                Inactivitytimer.CheckMovement();
             }
-            AntiTownStuck.TownStuck();
-            PortalStoneHelper.PortalStone();
-            Inactivitytimer.CheckMovement();
         }
 
         #endregion
@@ -338,6 +338,11 @@ namespace RadsAtom
                 return ((h == IntPtr.Zero || h == null));
             }
         }
+
+        #endregion
+
+        #region RnR Aggregator
+
 
         #endregion
     }
