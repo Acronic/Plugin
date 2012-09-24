@@ -17,6 +17,7 @@ using System.Windows.Shapes;
 using RadsAtom.Functions;
 using Zeta.Common;
 using Zeta.Common.Plugins;
+using Zeta.CommonBot.Settings;
 
 namespace RadsAtom.Gui
 {
@@ -168,12 +169,20 @@ namespace RadsAtom.Gui
 
         private void ConfigWindow_Closed(object sender, EventArgs e)
         {
+            if (GlobalSettings.Instance.LogoutInactivityTime > 0)
+            {
+                Logger.Log("Demonbuddys InactivityTimer is still active, please set it to 0 and try to activate RadsAtom InactivityTimer again.");
+                Settings.Inactrip = 0;
+            }
+            else
+            {
+                string it = textBox_inactivtytime.Text;
+                Settings.Inactrip = int.Parse(it);
+            }
             string np = textBox_nextprofile.Text;
             string lg = textBox_leavegame.Text;
-            string it = textBox_inactivtytime.Text;
             Settings.deathtrip = int.Parse(np);
             Settings.deathtrip2 = int.Parse(lg);
-            Settings.Inactrip = int.Parse(it);
             Settings.BNetUser = textBox_bnusername.Text;
             Settings.BNetPass = textBox_bnpassword.Text;
             AuthenticatorSettings.Instance.BnetUsername = Settings.BNetUser;
