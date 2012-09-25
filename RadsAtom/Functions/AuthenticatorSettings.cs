@@ -31,7 +31,7 @@ namespace RadsAtom.Functions
         #endregion
 
         [XmlElement("AuthenticatorAssembly")]
-        [DefaultValue(@"\Plugins\RadsAtom\Authenticator.dll")]
+        [DefaultValue(@"Plugins\RadsAtom\Authenticator.dll")]
         public string AuthenticatorAssembly { get; set; }
 
         [XmlElement("Serial")]

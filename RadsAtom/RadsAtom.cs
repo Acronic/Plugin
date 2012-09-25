@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Threading;
 using RadsAtom.Functions;
 using RadsAtom.Gui;
@@ -105,7 +101,7 @@ namespace RadsAtom
         {
             // Creating all paths needed
             string SettingsDirectory = Path.Combine(DBpath, "Settings");
-            ConfigWindow.pluginPath = DBpath + @"\Plugins\RadsAtom\";
+            ConfigWindow.pluginPath = DBpath + @"Plugins\RadsAtom\";
             Settings.settingsFile = Path.Combine(Path.Combine(SettingsDirectory, "RadsAtom"), "RadsAtom.cfg");
             if (File.Exists(Path.Combine(DBpath, "Input.txt")))
             {

@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using Zeta;
 using Zeta.Common;
@@ -93,7 +90,6 @@ namespace RadsAtom.Functions
                                                              ZetaDia.Service.Games.LeaveGame();
                                                              Thread.Sleep(2000);
                                                          }
-
                                                      }
                                                      else
                                                      {

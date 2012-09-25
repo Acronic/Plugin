@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Zeta.Common;
+﻿using Zeta.Common;
 using Zeta.CommonBot.Profile;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
