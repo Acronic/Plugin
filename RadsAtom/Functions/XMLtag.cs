@@ -88,7 +88,6 @@ namespace RadsAtom.Functions
                                                              Logger.Log("Leaving the game.");
                                                              Thread.Sleep(1000);
                                                              ZetaDia.Service.Games.LeaveGame();
-                                                             Thread.Sleep(2000);
                                                          }
                                                      }
                                                      else

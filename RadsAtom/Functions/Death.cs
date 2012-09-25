@@ -109,7 +109,6 @@ namespace RadsAtom.Functions
                         ZetaDia.Service.Games.LeaveGame();
                         if (!ZetaDia.Me.IsInTown)
                             Thread.Sleep(10000);
-                        Thread.Sleep(1000);
                     }
                 }
             }
@@ -121,11 +120,7 @@ namespace RadsAtom.Functions
                 Logger.Log("Leave game, died too much.");
                 if (!ZetaDia.Me.IsInTown)
                 {
-                    Thread.Sleep(11000);
-                }
-                else
-                {
-                    Thread.Sleep(1000);
+                    Thread.Sleep(10000);
                 }
             }
         }
@@ -161,11 +156,7 @@ namespace RadsAtom.Functions
                         Logger.Log("Leave game, died too much.");
                         if (!ZetaDia.Me.IsInTown)
                         {
-                            Thread.Sleep(11000);
-                        }
-                        else
-                        {
-                            Thread.Sleep(1000);
+                            Thread.Sleep(10000);
                         }
                     }
                     else

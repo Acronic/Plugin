@@ -106,7 +106,6 @@ namespace RadsAtom.Functions
                                 ZetaDia.Service.Games.LeaveGame();
                                 if (!ZetaDia.Me.IsInTown)
                                     Thread.Sleep(10000);
-                                Thread.Sleep(1000);
                             }
                         }
 
