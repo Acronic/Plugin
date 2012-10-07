@@ -56,6 +56,7 @@
     <Compile Include="Functions\DeathStatement.cs" />
     <Compile Include="Functions\Inactivitytimer.cs" />
     <Compile Include="Functions\Logger.cs" />
+    <Compile Include="Functions\Mrworker.cs" />
     <Compile Include="Functions\PortalStoneHelper.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Gui\ConfigWindow.xaml.cs">

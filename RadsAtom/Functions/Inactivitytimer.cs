@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Xml;
@@ -16,12 +17,42 @@ using Zeta.Internals.Actors;
 
 namespace RadsAtom.Functions
 {
-    class Inactivitytimer
+    public static class Inactivitytimer
     {
         private static DateTime lastlooked = DateTime.Now;
         private static DateTime lastcheck = DateTime.Now;
         private static Vector3 lastpos;
         private static bool Inactivty = false;
+        private static bool Activated = false;
+        private static bool isRunning = false;
+
+
+        public static void InactivityThread()
+        {
+            Logger.Log("Inactivty thread is starting.");
+            while (!isClosed)
+            {
+                try
+                {
+                    CheckMovement();
+                }
+                catch(Exception ex)
+                {
+                    Logger.Log(ex.ToString());
+                }
+                Thread.Sleep(1000);
+            }
+            Logger.Log("Inactivty thead is Closing.");
+        }
+
+        private static bool isClosed
+        {
+            get
+            {
+                IntPtr h = Process.GetCurrentProcess().MainWindowHandle;
+                return ((h == IntPtr.Zero || h == null));
+            }
+        }
 
         public static bool isBusy()
         {
@@ -49,13 +80,16 @@ namespace RadsAtom.Functions
         {
             if (Settings.Inactrip > 0)
             {
-                if (Inactivty)
+                if (Inactivty && !Activated && !isRunning && ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld)
                 {
                     try
                     {
+                        isRunning = true;
+                        Activated = true;
                         if (!ZetaDia.Me.IsInTown)
                         {
                             ZetaDia.Me.UseTownPortal();
+                            Thread.Sleep(3000);
                         }
                         string lastprofile = GlobalSettings.Instance.LastProfile;
                         string newprofiles = "";
@@ -93,39 +127,48 @@ namespace RadsAtom.Functions
                             {
                                 Inactivty = false;
                                 Death.DeathReset();
-                                ProfileManager.Load(profile);
+                                Mrworker.MrProfile = profile;
+                                Mrworker.LoadProfile = true;
                                 Logger.Log("Loading next profile, stuck too long: " + profile);
                             }
                             else
                             {
                                 Inactivty = false;
-                                ProfileManager.Load(Settings.BackupProfile);
+                                Mrworker.MrProfile = Settings.BackupProfile;
+                                Mrworker.LoadProfile = true;
+                                Mrworker.MrLeaver = true;
                                 Logger.Log("Leave game, last profile, stuck too long");
                                 Death.DeathReset();
-                                Thread.Sleep(1000);
-                                ZetaDia.Service.Games.LeaveGame();
-                                if (!ZetaDia.Me.IsInTown)
-                                    Thread.Sleep(10000);
                             }
+                            Mrworker.IsExecute = true;
+                            isRunning = false;
                         }
 
                     }
                     catch (Exception ex)
                     {
+                        isRunning = false;
                         Inactivty = false;
                         Logger.LogDiag("Error: " + ex.ToString());
                     }
                 }
+                else if (ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld)
+                {
+                    if (ZetaDia.Me.IsInTown)
+                    {
+                        lastpos = ZetaDia.Me.Position;
+                    }
+                }
                 else
                 {
-                    if (!isBusy())
+                    if (ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld)
                     {
-                        if (DateTime.Now.Subtract(lastlooked).TotalSeconds > 5)
+                        if (!isBusy() && !isRunning && DateTime.Now.Subtract(lastlooked).TotalSeconds > 5)
                         {
                             lastlooked = DateTime.Now;
-                            if (lastpos.Distance(ZetaDia.Me.Position) < 10)
+                            if (lastpos.Distance(ZetaDia.Me.Position) < 10 && !Activated)
                             {
-                                int Inactivitytimer = Settings.Inactrip*60;
+                                int Inactivitytimer = Settings.Inactrip * 60;
                                 if (DateTime.Now.Subtract(lastcheck).TotalSeconds > Inactivitytimer)
                                 {
                                     Inactivty = true;
@@ -135,7 +178,8 @@ namespace RadsAtom.Functions
                             }
                             lastcheck = DateTime.Now;
                             lastpos = ZetaDia.Me.Position;
-                        }
+                            Activated = false;
+                        } 
                     }
                 }
             }

@@ -62,7 +62,8 @@ namespace RadsAtom.Functions
             string lastprofile = GlobalSettings.Instance.LastProfile;
             if (Count < Settings.deathtrip)
             {
-                ProfileManager.Load(lastprofile);
+                Mrworker.MrProfile = lastprofile;
+                Mrworker.LoadProfile = true;
                 Logger.Log("Reload current profile.");
             }
             else if (Count < Settings.deathtrip2)
@@ -97,32 +98,30 @@ namespace RadsAtom.Functions
                     string profile = profilepath + "\\" + newprofile;
                     if (isexitgame == "")
                     {
-                        ProfileManager.Load(profile);
+                        Mrworker.MrProfile = profile;
+                        Mrworker.LoadProfile = true;
                         Logger.Log("Loading next profile, died too much: " + profile);
                     }
                     else
                     {
-                        ProfileManager.Load(Settings.BackupProfile);
+                        Mrworker.MrProfile = Settings.BackupProfile;
+                        Mrworker.LoadProfile = true;
+                        Mrworker.MrLeaver = true;
                         Logger.Log("Leave game, last profile");
                         DeathReset();
                         isexitgame = "";
-                        ZetaDia.Service.Games.LeaveGame();
-                        if (!ZetaDia.Me.IsInTown)
-                            Thread.Sleep(10000);
                     }
                 }
             }
             else
             {
-                ProfileManager.Load(Settings.BackupProfile);
+                Mrworker.MrProfile = Settings.BackupProfile;
+                Mrworker.LoadProfile = true;
+                Mrworker.MrLeaver = true;
                 DeathReset();
-                ZetaDia.Service.Games.LeaveGame();
                 Logger.Log("Leave game, died too much.");
-                if (!ZetaDia.Me.IsInTown)
-                {
-                    Thread.Sleep(10000);
-                }
             }
+            Mrworker.IsExecute = true;
         }
 
 
@@ -146,14 +145,18 @@ namespace RadsAtom.Functions
                     Settings.DSinuse = false;
                     if (Settings.DSaction == "nextprofile")
                     {
-                        ProfileManager.Load(DSprofile);
+                        Mrworker.MrProfile = DSprofile;
+                        Mrworker.LoadProfile = true;
                         Logger.Log("Loading next profile, died too much: " + DSprofile);
+                        Mrworker.IsExecute = true;
                     }
                     else if (Settings.DSaction == "leave")
                     {
-                        ProfileManager.Load(DSprofile);
-                        ZetaDia.Service.Games.LeaveGame();
+                        Mrworker.MrProfile = DSprofile;
+                        Mrworker.LoadProfile = true;
+                        Mrworker.MrLeaver = true;
                         Logger.Log("Leave game, died too much.");
+                        Mrworker.IsExecute = true;
                         if (!ZetaDia.Me.IsInTown)
                         {
                             Thread.Sleep(10000);

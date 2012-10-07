@@ -3,9 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" Height="300" Width="300" Name="mainControl">
+             mc:Ignorable="d" Height="350" Width="300" Name="mainControl">
     <Grid>
-        <TabControl Height="276" HorizontalAlignment="Left" Margin="12,12,0,0" Name="tabControl1" VerticalAlignment="Top" Width="276">
+        <TabControl Height="326" HorizontalAlignment="Left" Margin="12,12,0,0" Name="tabControl1" VerticalAlignment="Top" Width="276">
             <TabItem Header="General" Name="tabGeneral">
                 <Grid>
                     <GroupBox Header="Death Handling" Height="153" HorizontalAlignment="Left" Margin="6,6,0,0" Name="groupBox3" VerticalAlignment="Top" Width="134">
@@ -28,13 +28,33 @@
                             <TextBox Height="23" HorizontalAlignment="Left" Margin="34,22,0,0" Name="textBox_inactivtytime" VerticalAlignment="Top" Width="35" />
                         </Grid>
                     </GroupBox>
+                    <GroupBox Header="Break Timer" Height="133" HorizontalAlignment="Left" Margin="6,155,0,0" Name="groupBox5" VerticalAlignment="Top" Width="254">
+                        <Grid>
+                            <CheckBox Content="Enable break" Height="16" HorizontalAlignment="Left" Margin="7,6,0,0" Name="checkBox_enablebreak" VerticalAlignment="Top" />
+                            <TextBox Height="23" HorizontalAlignment="Right" Margin="0,49,173,0" Name="textBox_breakdurationmin" VerticalAlignment="Top" Width="33" />
+                            <TextBox Height="23" HorizontalAlignment="Left" Margin="36,76,0,0" Name="textBox_breakdurationmax" VerticalAlignment="Top" Width="33" />
+                            <TextBlock Height="15" HorizontalAlignment="Left" Margin="7,52,0,0" Name="textBlock2" Text="Min:" VerticalAlignment="Top" />
+                            <TextBlock Height="18" HorizontalAlignment="Left" Margin="7,79,0,0" Name="textBlock3" Text="Max:" VerticalAlignment="Top" />
+                            <TextBlock Height="16" HorizontalAlignment="Left" Margin="6,27,0,0" Name="textBlock4" Text="Break Duration" VerticalAlignment="Top" />
+                            <TextBlock Height="16" HorizontalAlignment="Left" Margin="91,27,0,0" Name="textBlock5" Text="Until Break" VerticalAlignment="Top" />
+                            <TextBox Height="23" HorizontalAlignment="Left" Margin="116,49,0,0" Name="textBox_untilbreakmin" VerticalAlignment="Top" Width="33" />
+                            <TextBox Height="23" HorizontalAlignment="Left" Margin="116,76,0,0" Name="textBox_untilbreakmax" VerticalAlignment="Top" Width="33" />
+                            <TextBlock Height="18" HorizontalAlignment="Left" Margin="85,52,0,0" Name="textBlock6" Text="Min:" VerticalAlignment="Top" />
+                            <TextBlock Height="17" HorizontalAlignment="Left" Margin="85,79,0,0" Name="textBlock7" Text="Max:" VerticalAlignment="Top" />
+                            <TextBlock Height="14" HorizontalAlignment="Left" Margin="179,6,0,0" Name="textBlock8" Text="PreSets" VerticalAlignment="Top" />
+                            <Button Content="12h" Height="20" HorizontalAlignment="Left" Margin="174,23,0,0" Name="button_12h" VerticalAlignment="Top" Width="45" />
+                            <Button Content="24h" Height="20" HorizontalAlignment="Left" Margin="174,42,0,0" Name="button_24h" VerticalAlignment="Top" Width="45" />
+                            <Button Content="Sleep" Height="20" HorizontalAlignment="Left" Margin="174,60,0,0" Name="button_sleep" VerticalAlignment="Top" Width="45" />
+                            <Button Content="Default" Height="20" HorizontalAlignment="Left" Margin="174,79,0,0" Name="button_defaultbreak" VerticalAlignment="Top" Width="45" />
+                        </Grid>
+                    </GroupBox>
                 </Grid>
             </TabItem>
             <TabItem Header="Relogger" Name="tabRelogger">
                 <Grid>
                     <CheckBox Content="Enable Relogger" Height="16" HorizontalAlignment="Left" Margin="79,47,0,0" Name="checkBox_enablerelogger" VerticalAlignment="Top" />
                     <TextBox Height="23" HorizontalAlignment="Left" Margin="140,71,0,0" Name="textBox_bnusername" VerticalAlignment="Top" Width="120" />
-                    <TextBox Height="23" HorizontalAlignment="Left" Margin="140,100,0,0" Name="textBox_bnpassword" VerticalAlignment="Top" Width="120" />
+                    <PasswordBox Height="23" HorizontalAlignment="Left" Margin="140,100,0,0" Name="textBox_bnpassword" VerticalAlignment="Top" Width="120" />
                     <Label Content="Battle.net Username:" Height="28" HorizontalAlignment="Left" Margin="6,69,0,0" Name="label1" VerticalAlignment="Top" />
                     <Label Content="Battle.net Password:" Height="28" HorizontalAlignment="Left" Margin="6,98,0,0" Name="label2" VerticalAlignment="Top" />
                     <ProgressBar Height="13" HorizontalAlignment="Left" Margin="47,0,0,32" Name="progressBar1" VerticalAlignment="Bottom" Width="176" />

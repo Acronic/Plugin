@@ -21,7 +21,7 @@ namespace RadsAtom
         // IPlugin information
         public Version Version
         {
-            get { return new Version(1, 1); }
+            get { return new Version(1, 3, 4); }
         }
 
         public string Author
@@ -44,6 +44,8 @@ namespace RadsAtom
             return (other.Name == Name) && (other.Version == Version);
         }
 
+        public Thread threadMrworker;
+        public Thread threadInactivty;
         public const string PName = "RadsAtom";
         public static string DBpath = AppDomain.CurrentDomain.BaseDirectory;
 
@@ -95,6 +97,14 @@ namespace RadsAtom
                 threadWorker.IsBackground = true;
                 threadWorker.Start(); 
             }
+
+            threadInactivty = new Thread(new ThreadStart(Inactivitytimer.InactivityThread));
+            threadInactivty.IsBackground = true;
+            threadInactivty.Start();
+
+            threadMrworker = new Thread(new ThreadStart(Mrworker.MrThread));
+            threadMrworker.IsBackground = true;
+            threadMrworker.Start();
         }
 
         public void OnInitialize()
@@ -134,12 +144,11 @@ namespace RadsAtom
         public void OnPulse()
         {
             // Check if ingame and check if its not in a Loadingscreen.
-            if (Settings.ingamecheck && ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld)
+            if (ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld)
             {
                 Death.DeathCount();
                 AntiTownStuck.TownStuck();
                 PortalStoneHelper.PortalStone();
-                Inactivitytimer.CheckMovement();
             }
         }
 
@@ -150,10 +159,11 @@ namespace RadsAtom
         public static Authenticator Auth;
         private UIElement AuthTextbox, AuthButton, LoginUsername, LoginPassword, LoginButton;
         private Thread threadWorker;
+        private bool StartProfile = false;
 
         public void Worker()
         {
-            Logger.Log("Thread start");
+            Logger.Log("Relogger thread is starting.");
             bool isSynced = false;
             while (!isClosing)
             {
@@ -215,6 +225,7 @@ namespace RadsAtom
                                 Thread.Sleep(1000);
                                 LoginButton.Click();
                             }
+                            StartProfile = true;
                             Thread.Sleep(1000);
                             continue;
                         }
@@ -232,6 +243,13 @@ namespace RadsAtom
                             AuthTextbox.SetText(Auth.CurrentCode);
                             Thread.Sleep(100);
                             AuthButton.Click();
+                        }
+
+                        // Check if we need to start the profile after we logged in.
+                        if (StartProfile)
+                        {
+                            Mrworker.RelogRestart = true;
+                            StartProfile = false;
                         }
                     }
                 }

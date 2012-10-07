@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using RadsAtom.Functions;
+using Zeta;
+using Zeta.CommonBot;
 
 namespace RadsAtom
 {
@@ -22,6 +24,16 @@ namespace RadsAtom
         public static bool AlreadyHandledDeathPortal = true;
         public static bool WasVendoringAfterDeath = false;
         public static int Inactrip = 0;
+        public static volatile bool ResetBreakTimer = true;
+        public static DateTime ThisTime = DateTime.Now;
+        public static bool UseBreak = false;
+        public static int MinBreak = 120;
+        public static int MaxBreak = 240;
+        public static int ThisBreak;
+        public static int BreakTimeMin = 5;
+        public static int BreakTimeMax = 30;
+        public static int BreakTime;
+
 
 
         // Death Statement Tag
@@ -33,13 +45,10 @@ namespace RadsAtom
 
         public static void AtomOnGameJoined(object src, EventArgs mea)
         {
-            Death.DeathReset();
-            ingamecheck = true;
         }
 
         public static void AtomOnGameLeft(object src, EventArgs mea)
         {
-            ingamecheck = false;
         }
 
         public static void SaveSettings()
@@ -52,10 +61,15 @@ namespace RadsAtom
                 settingsWriter.WriteLine("Deathtrip " + deathtrip.ToString());
                 settingsWriter.WriteLine("Deathtrip2 " + deathtrip2.ToString());
                 settingsWriter.WriteLine("UseRelogger " + UseRelogger.ToString());
-                settingsWriter.WriteLine("BNetUser " + BNetUser.ToString());
-                settingsWriter.WriteLine("BNetPass " + BNetPass.ToString());
+                settingsWriter.WriteLine("BNetUser " + BNetUser);
+                settingsWriter.WriteLine("BNetPass " + BNetPass);
                 settingsWriter.WriteLine("UseSecurityRandomizer " + UseSecurityRandomizer.ToString());
                 settingsWriter.WriteLine("InactivityTime " + Inactrip.ToString());
+                settingsWriter.WriteLine("UseBreak " + UseBreak.ToString());
+                settingsWriter.WriteLine("BreakDurationMin " + BreakTimeMin.ToString());
+                settingsWriter.WriteLine("BreakDurationMax " + BreakTimeMax.ToString());
+                settingsWriter.WriteLine("UntilBreakMin " + MinBreak.ToString());
+                settingsWriter.WriteLine("UntilBreakMax " + MaxBreak.ToString());
             }
             settingsStream.Close();
             SavingSettings = false;
@@ -98,6 +112,21 @@ namespace RadsAtom
                                 break;
                             case "InactivityTime":
                                 Inactrip = Convert.ToInt32(settings[1]);
+                                break;
+                            case "UseBreak":
+                                UseBreak = Convert.ToBoolean(settings[1]);
+                                break;
+                            case "BreakDurationMin":
+                                BreakTimeMin = Convert.ToInt32(settings[1]);
+                                break;
+                            case "BreakDurationMax":
+                                BreakTimeMax = Convert.ToInt32(settings[1]);
+                                break;
+                            case "UntilBreakMin":
+                                MinBreak = Convert.ToInt32(settings[1]);
+                                break;
+                            case "UntilBreakMax":
+                                MaxBreak = Convert.ToInt32(settings[1]);
                                 break;
                         }
                     }

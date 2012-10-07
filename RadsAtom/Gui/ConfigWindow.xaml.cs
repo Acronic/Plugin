@@ -59,10 +59,11 @@ namespace RadsAtom.Gui
         // --------------- Tools -----------------
         //----------------------------------------
         private Thread threadWorker;
-        private CheckBox checkBox_enablerelogger, checkBox_securityrandomization;
-        private TextBox textBox_bnusername, textBox_bnpassword, textBox_serial, textBox_code, textBox_nextprofile, textBox_leavegame, textBox_inactivtytime;
+        private CheckBox checkBox_enablerelogger, checkBox_securityrandomization, checkBox_enablebreak;
+        private TextBox textBox_bnusername, textBox_serial, textBox_code, textBox_nextprofile, textBox_leavegame, textBox_inactivtytime, textBox_breakdurationmin, textBox_breakdurationmax, textBox_untilbreakmin, textBox_untilbreakmax;
         private ProgressBar progressBar1;
-        private Button button_enroll, button_restore;
+        private Button button_enroll, button_restore, button_12h, button_24h, button_sleep, button_defaultbreak;
+        private PasswordBox textBox_bnpassword;
 
 
         public void CreateWindow()
@@ -77,9 +78,12 @@ namespace RadsAtom.Gui
             confwindow.Closed += ConfigWindow_Closed;
             confwindow.Loaded += ConfigWindow_Loaded;
 
+
+
             // ProgressBar
             progressBar1 = LogicalTreeHelper.FindLogicalNode(xamlContent, "progressBar1") as ProgressBar;
             progressBar1.Maximum = 30;
+
 
 
             // CheckBoxes
@@ -89,16 +93,24 @@ namespace RadsAtom.Gui
             checkBox_securityrandomization = LogicalTreeHelper.FindLogicalNode(xamlContent, "checkBox_securityrandomization") as CheckBox;
             checkBox_securityrandomization.Checked += checkBox_securityrandomization_Checked;
             checkBox_securityrandomization.Unchecked += checkBox_securityrandomization_Unchecked;
+            checkBox_enablebreak = LogicalTreeHelper.FindLogicalNode(xamlContent, "checkBox_enablebreak") as CheckBox;
+            checkBox_enablebreak.Checked += checkBox_enablebreak_Checked;
+            checkBox_enablebreak.Unchecked += checkBox_enablebreak_Unchecked;
+
 
 
             // TextBoxes
             textBox_bnusername = LogicalTreeHelper.FindLogicalNode(xamlContent, "textBox_bnusername") as TextBox;
             textBox_serial = LogicalTreeHelper.FindLogicalNode(xamlContent, "textBox_serial") as TextBox;
             textBox_code = LogicalTreeHelper.FindLogicalNode(xamlContent, "textBox_code") as TextBox;
-            textBox_bnpassword = LogicalTreeHelper.FindLogicalNode(xamlContent, "textBox_bnpassword") as TextBox;
             textBox_nextprofile = LogicalTreeHelper.FindLogicalNode(xamlContent, "textBox_nextprofile") as TextBox;
             textBox_leavegame = LogicalTreeHelper.FindLogicalNode(xamlContent, "textBox_leavegame") as TextBox;
             textBox_inactivtytime = LogicalTreeHelper.FindLogicalNode(xamlContent, "textBox_inactivtytime") as TextBox;
+            textBox_breakdurationmin = LogicalTreeHelper.FindLogicalNode(xamlContent, "textBox_breakdurationmin") as TextBox;
+            textBox_breakdurationmax = LogicalTreeHelper.FindLogicalNode(xamlContent, "textBox_breakdurationmax") as TextBox;
+            textBox_untilbreakmin = LogicalTreeHelper.FindLogicalNode(xamlContent, "textBox_untilbreakmin") as TextBox;
+            textBox_untilbreakmax = LogicalTreeHelper.FindLogicalNode(xamlContent, "textBox_untilbreakmax") as TextBox;
+
 
 
             // Button
@@ -106,8 +118,64 @@ namespace RadsAtom.Gui
             button_enroll.Click += button_enroll_Click;
             button_restore = LogicalTreeHelper.FindLogicalNode(xamlContent, "button_restore") as Button;
             button_restore.Click += button_restore_Click;
+            button_12h = LogicalTreeHelper.FindLogicalNode(xamlContent, "button_12h") as Button;
+            button_12h.Click += button_12h_Click;
+            button_24h = LogicalTreeHelper.FindLogicalNode(xamlContent, "button_24h") as Button;
+            button_24h.Click += button_24h_Click;
+            button_sleep = LogicalTreeHelper.FindLogicalNode(xamlContent, "button_sleep") as Button;
+            button_sleep.Click += button_sleep_Click;
+            button_defaultbreak = LogicalTreeHelper.FindLogicalNode(xamlContent, "button_defaultbreak") as Button;
+            button_defaultbreak.Click += button_defaultbreak_Click;
 
 
+
+            // PasswordBoxes
+            textBox_bnpassword = LogicalTreeHelper.FindLogicalNode(xamlContent, "textBox_bnpassword") as PasswordBox;
+
+
+
+        }
+
+        void button_defaultbreak_Click(object sender, RoutedEventArgs e)
+        {
+            textBox_breakdurationmin.Text = "5";
+            textBox_breakdurationmax.Text = "30";
+            textBox_untilbreakmin.Text = "120";
+            textBox_untilbreakmax.Text = "240";
+        }
+
+        void button_sleep_Click(object sender, RoutedEventArgs e)
+        {
+            textBox_breakdurationmin.Text = "360";
+            textBox_breakdurationmax.Text = "480";
+            textBox_untilbreakmin.Text = "720";
+            textBox_untilbreakmax.Text = "780";
+        }
+
+        void button_24h_Click(object sender, RoutedEventArgs e)
+        {
+            textBox_breakdurationmin.Text = "30";
+            textBox_breakdurationmax.Text = "90";
+            textBox_untilbreakmin.Text = "360";
+            textBox_untilbreakmax.Text = "480";
+        }
+
+        void button_12h_Click(object sender, RoutedEventArgs e)
+        {
+            textBox_breakdurationmin.Text = "1";
+            textBox_breakdurationmax.Text = "15";
+            textBox_untilbreakmin.Text = "120";
+            textBox_untilbreakmax.Text = "240";
+        }
+
+        void checkBox_enablebreak_Unchecked(object sender, RoutedEventArgs e)
+        {
+            Settings.UseBreak = false;
+        }
+
+        void checkBox_enablebreak_Checked(object sender, RoutedEventArgs e)
+        {
+            Settings.UseBreak = true;
         }
 
         void checkBox_securityrandomization_Unchecked(object sender, RoutedEventArgs e)
@@ -145,11 +213,16 @@ namespace RadsAtom.Gui
             
             checkBox_enablerelogger.IsChecked = Settings.UseRelogger;
             checkBox_securityrandomization.IsChecked = Settings.UseSecurityRandomizer;
+            checkBox_enablebreak.IsChecked = Settings.UseBreak;
             textBox_bnusername.Text = Settings.BNetUser;
-            textBox_bnpassword.Text = Settings.BNetPass;
+            textBox_bnpassword.Password = Settings.BNetPass;
             textBox_nextprofile.Text = Settings.deathtrip.ToString();
             textBox_leavegame.Text = Settings.deathtrip2.ToString();
             textBox_inactivtytime.Text = Settings.Inactrip.ToString();
+            textBox_breakdurationmin.Text = Settings.BreakTimeMin.ToString();
+            textBox_breakdurationmax.Text = Settings.BreakTimeMax.ToString();
+            textBox_untilbreakmin.Text = Settings.MinBreak.ToString();
+            textBox_untilbreakmax.Text = Settings.MaxBreak.ToString();
             threadWorker = new Thread(new ThreadStart(Worker));
             threadWorker.SetApartmentState(ApartmentState.STA);
             threadWorker.Start();
@@ -168,12 +241,14 @@ namespace RadsAtom.Gui
                 string it = textBox_inactivtytime.Text;
                 Settings.Inactrip = int.Parse(it);
             }
-            string np = textBox_nextprofile.Text;
-            string lg = textBox_leavegame.Text;
-            Settings.deathtrip = int.Parse(np);
-            Settings.deathtrip2 = int.Parse(lg);
+            Settings.deathtrip = int.Parse(textBox_nextprofile.Text);
+            Settings.deathtrip2 = int.Parse(textBox_leavegame.Text);
+            Settings.BreakTimeMin = int.Parse(textBox_breakdurationmin.Text);
+            Settings.BreakTimeMax = int.Parse(textBox_breakdurationmax.Text);
+            Settings.MinBreak = int.Parse(textBox_untilbreakmin.Text);
+            Settings.MaxBreak = int.Parse(textBox_untilbreakmax.Text);
             Settings.BNetUser = textBox_bnusername.Text;
-            Settings.BNetPass = textBox_bnpassword.Text;
+            Settings.BNetPass = textBox_bnpassword.Password;
             AuthenticatorSettings.Instance.BnetUsername = Settings.BNetUser;
             AuthenticatorSettings.Instance.BnetPassword = Settings.BNetPass;
             AuthenticatorSettings.Instance.Save();
