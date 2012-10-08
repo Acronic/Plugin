@@ -152,14 +152,14 @@ namespace RadsAtom.Functions
                         Logger.LogDiag("Error: " + ex.ToString());
                     }
                 }
-                else if (ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld)
+                else if (ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld && ZetaDia.Me.IsInTown)
                 {
                     if (ZetaDia.Me.IsInTown)
                     {
                         lastpos = ZetaDia.Me.Position;
                     }
                 }
-                else
+                else if (ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld)
                 {
                     if (ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld)
                     {
