@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using Zeta;
 using Zeta.Internals;
 
 namespace RadsAtom.Functions
@@ -10,8 +11,17 @@ namespace RadsAtom.Functions
 
         public static void PortalStone()
         {
-            if (DateTime.Now.Subtract(lastlooked).TotalSeconds > 5)
+            if (DateTime.Now.Subtract(lastlooked).TotalSeconds > 3)
             {
+                if (ZetaDia.Me != null)
+                {
+                    if (ZetaDia.IsPlayingCutscene)
+                    {
+                        ZetaDia.Me.SkipCutscene();
+                        Logger.Log("Canceling cutscene.");
+                    }
+                }
+
                 UIElement warning = UIElement.FromHash(0xF9E7B8A635A4F725);
                 if (warning.IsValid && warning.IsVisible)
                 {

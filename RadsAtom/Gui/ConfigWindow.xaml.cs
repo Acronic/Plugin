@@ -252,6 +252,9 @@ namespace RadsAtom.Gui
             AuthenticatorSettings.Instance.BnetUsername = Settings.BNetUser;
             AuthenticatorSettings.Instance.BnetPassword = Settings.BNetPass;
             AuthenticatorSettings.Instance.Save();
+            Logger.Log("Resetting the breaktimer.");
+            Settings.ResetBreakTimer = true;
+
             Settings.SaveSettings();
 
             try

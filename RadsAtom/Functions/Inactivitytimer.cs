@@ -19,14 +19,16 @@ namespace RadsAtom.Functions
 {
     public static class Inactivitytimer
     {
+        // Varibles
         private static DateTime lastlooked = DateTime.Now;
         private static DateTime lastcheck = DateTime.Now;
         private static Vector3 lastpos;
-        private static bool Inactivty = false;
-        private static bool Activated = false;
-        private static bool isRunning = false;
+        private static volatile bool Inactivty = false;
+        private static volatile bool TownInactivty = false;
+        private static volatile bool Activated = false;
+        private static volatile bool isRunning = false;
 
-
+        // The inactivity thread, which is executing the check void.
         public static void InactivityThread()
         {
             Logger.Log("Inactivty thread is starting.");
@@ -34,17 +36,21 @@ namespace RadsAtom.Functions
             {
                 try
                 {
-                    CheckMovement();
+                    if (ZetaDia.Me != null)
+                    {
+                        CheckMovement();
+                    }
                 }
                 catch(Exception ex)
                 {
-                    Logger.Log(ex.ToString());
+                    Logger.LogDiag(ex.ToString());
                 }
                 Thread.Sleep(1000);
             }
             Logger.Log("Inactivty thead is Closing.");
         }
 
+        // Checking if DB is alive or not, making the thread safely close if it is not.
         private static bool isClosed
         {
             get
@@ -54,6 +60,7 @@ namespace RadsAtom.Functions
             }
         }
 
+        // Checking if different KEY ui elements is present, and if the char is dead or is fighting.
         public static bool isBusy()
         {
             try
@@ -76,11 +83,20 @@ namespace RadsAtom.Functions
             return false;
         }
 
+        // This is the big one.
         public static void CheckMovement()
         {
-            if (Settings.Inactrip > 0)
+            // Only check if the setting is over 0
+            if (Settings.Inactrip > 0 && BotMain.IsRunning && !BotMain.IsPaused && !BotMain.IsPausedForStateExecution)
             {
-                if (Inactivty && !Activated && !isRunning && ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld)
+                // Resetting the position and datetime if we are not in a game, if we are loading the world or if we are playing a cutscene.
+                if (!ZetaDia.IsInGame || ZetaDia.IsLoadingWorld || ZetaDia.IsPlayingCutscene)
+                {
+                    lastpos = Vector3.Zero;
+                    lastcheck = DateTime.Now;
+                }
+                //This is if the bot is shown to be inactive. This will TP to town, load next profile and if its the last profile in the line of profiles. It will leave the game.
+                else if (Inactivty && !Activated && !isRunning && ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld)
                 {
                     try
                     {
@@ -89,7 +105,7 @@ namespace RadsAtom.Functions
                         if (!ZetaDia.Me.IsInTown)
                         {
                             ZetaDia.Me.UseTownPortal();
-                            Thread.Sleep(3000);
+                            Thread.Sleep(5000);
                         }
                         string lastprofile = GlobalSettings.Instance.LastProfile;
                         string newprofiles = "";
@@ -143,7 +159,6 @@ namespace RadsAtom.Functions
                             Mrworker.IsExecute = true;
                             isRunning = false;
                         }
-
                     }
                     catch (Exception ex)
                     {
@@ -152,14 +167,68 @@ namespace RadsAtom.Functions
                         Logger.LogDiag("Error: " + ex.ToString());
                     }
                 }
+                // This is the same as above, but if we are inactive in town. Then it will just reload the profile. In a hope to recover.
+                else if (TownInactivty && !Activated && !isRunning && ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld)
+                {
+                    try
+                    {
+                        isRunning = true;
+                        Activated = true;
+                        string lastprofile = GlobalSettings.Instance.LastProfile;
+                        Inactivty = false;
+                        Death.DeathReset();
+                        Mrworker.MrProfile = lastprofile;
+                        Mrworker.LoadProfile = true;
+                        Logger.Log("Reloading profile, stuck in town too long: " + lastprofile);
+                        Mrworker.IsExecute = true;
+                        isRunning = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        isRunning = false;
+                        Inactivty = false;
+                        Logger.LogDiag("Error: " + ex);
+                    }
+                }
+                // This is if we are in town, it will check you pos and the time to gather info about if we want to trip the activator.
                 else if (ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld && ZetaDia.Me.IsInTown)
                 {
                     if (ZetaDia.Me.IsInTown)
                     {
-                        lastpos = ZetaDia.Me.Position;
+                        if(!isBusy())
+                        {
+                            if (lastpos.Distance(ZetaDia.Me.Position) < 10 && !Activated)
+                            {
+                                int i;
+                                if (Settings.Inactrip > 1)
+                                {
+                                    i = Settings.Inactrip / 2;
+                                }
+                                else
+                                {
+                                    i = Settings.Inactrip;
+                                }
+                                int Inactivitytimer = i * 60;
+                                if (DateTime.Now.Subtract(lastcheck).TotalSeconds > Inactivitytimer)
+                                {
+                                    TownInactivty = true;
+                                    return;
+                                }
+                                return;
+                            }
+                            lastcheck = DateTime.Now;
+                            lastpos = ZetaDia.Me.Position;
+                            Activated = false;
+                        }
+                        else
+                        {
+                            lastpos = Vector3.Zero;
+                            lastcheck = DateTime.Now;
+                        }
                     }
                 }
-                else if (ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld)
+                // This is if we are in out in the wild and discovering! This will check if we are moving or not, and by how much.
+                else if (ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld && ZetaDia.Me != null)
                 {
                     if (ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld)
                     {
@@ -186,6 +255,7 @@ namespace RadsAtom.Functions
         }
     }
 
+    // Sinterlkaas ElementTester
     #region ElementTester
     public static class _UIElement
     {

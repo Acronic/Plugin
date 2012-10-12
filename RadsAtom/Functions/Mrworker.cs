@@ -6,11 +6,13 @@ using System.Text;
 using System.Threading;
 using Zeta;
 using Zeta.CommonBot;
+using UIElement = Zeta.Internals.UIElement;
 
 namespace RadsAtom.Functions
 {
     public static class Mrworker
     {
+
         // making this thread start the bot, load the profile and leave the game.
         public static void MrThread()
         {
@@ -19,6 +21,27 @@ namespace RadsAtom.Functions
             {
                 try
                 {
+                    // Check for ErrorDialogs!
+                    if (ErrorDialog.IsVisible && !ZetaDia.IsInGame)
+                    {
+                        Logger.Log("Error Dialog found, closing dialog");
+                        ErrorDialog.Click();
+                        Thread.Sleep(200);
+                    }
+
+
+                    // Take the break!
+                    if (TakeABreakNOW && Settings.UseBreak)
+                    {
+                        TakeABreakNOW = false;
+                        BotMain.Stop();
+                        Logger.Log(string.Format("Will Stop the bot for {0} minutes.", Settings.BreakTime / 60000));
+                        Thread.Sleep(Settings.BreakTime);
+                        BotMain.Start();
+                        Settings.ResetBreakTimer = true;
+                    }
+
+
                     // Set the breaktimer!
                     if (Settings.ResetBreakTimer && Settings.UseBreak && !ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld)
                     {
@@ -38,8 +61,9 @@ namespace RadsAtom.Functions
                         Logger.Log(string.Format("{0} minutes to next break, the break will last for {1} minutes.", Settings.ThisBreak / 60, Settings.BreakTime / 60000));
                     }
 
+
                     // Trip the breaktimer!
-                    if (BreakSettingsSet && !ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld && DateTime.Now.Subtract(Settings.ThisTime).TotalSeconds > Settings.ThisBreak)
+                    if (BreakSettingsSet && Settings.UseBreak && !ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld && DateTime.Now.Subtract(Settings.ThisTime).TotalSeconds > Settings.ThisBreak)
                     {
                         TakeABreakNOW = true;
                     }
@@ -56,8 +80,9 @@ namespace RadsAtom.Functions
                     }
                     
                     // Execute XML stuff.
-                    if (XMLdone)
+                    if (XMLdone && !IsExecute)
                     {
+                        
                         Thread.Sleep(100);
                         if (LoadProfile)
                         {
@@ -72,7 +97,7 @@ namespace RadsAtom.Functions
                             BotMain.Stop();
                             Thread.Sleep(2000);
                             ZetaDia.Service.Games.LeaveGame();
-                            Thread.Sleep(2000);
+                            Thread.Sleep(5000);
                             BotMain.Start();
                         }
 
@@ -80,8 +105,9 @@ namespace RadsAtom.Functions
                     }
 
                     // Execute stuff from other stuff :D
-                    if (IsExecute)
+                    if (IsExecute && !XMLdone)
                     {
+                        
                         if (LoadProfile)
                         {
                             LoadProfile = false;
@@ -95,27 +121,17 @@ namespace RadsAtom.Functions
                             BotMain.Stop();
                             Thread.Sleep(2000);
                             ZetaDia.Service.Games.LeaveGame();
-                            Thread.Sleep(2000);
+                            Thread.Sleep(5000);
                             BotMain.Start();
                         }
-
+                        
                         IsExecute = false;
                     }
 
-                    // Take the break!
-                    if (TakeABreakNOW)
-                    {
-                        TakeABreakNOW = false;
-                        BotMain.Stop();
-                        Logger.Log(string.Format("Will Stop the bot for {0} minutes.", Settings.BreakTime / 60000));
-                        Thread.Sleep(Settings.BreakTime);
-                        BotMain.Start();
-                        Settings.ResetBreakTimer = true;
-                    }
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex.ToString());
+                    Logger.LogDiag(ex.ToString());
                 }
                 Thread.Sleep(1000);
             }
