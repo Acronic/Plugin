@@ -26,7 +26,7 @@ namespace RadsAtom.Functions
                     {
                         Logger.Log("Error Dialog found, closing dialog");
                         ErrorDialog.Click();
-                        Thread.Sleep(200);
+                        RelogRestart = true;
                     }
 
 
@@ -75,7 +75,7 @@ namespace RadsAtom.Functions
                         BotMain.Stop();
                         Thread.Sleep(2000);
                         ProfileManager.Load(Settings.BackupProfile);
-                        Thread.Sleep(2000);
+                        Thread.Sleep(5000);
                         BotMain.Start();
                     }
                     
