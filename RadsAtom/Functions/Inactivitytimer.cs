@@ -175,7 +175,7 @@ namespace RadsAtom.Functions
                         isRunning = true;
                         Activated = true;
                         string lastprofile = GlobalSettings.Instance.LastProfile;
-                        Inactivty = false;
+                        TownInactivty = false;
                         Death.DeathReset();
                         Mrworker.MrProfile = lastprofile;
                         Mrworker.LoadProfile = true;
@@ -186,7 +186,7 @@ namespace RadsAtom.Functions
                     catch (Exception ex)
                     {
                         isRunning = false;
-                        Inactivty = false;
+                        TownInactivty = false;
                         Logger.LogDiag("Error: " + ex);
                     }
                 }

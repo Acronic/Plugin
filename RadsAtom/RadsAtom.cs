@@ -21,7 +21,7 @@ namespace RadsAtom
         // IPlugin information
         public Version Version
         {
-            get { return new Version(1, 4, 1); }
+            get { return new Version(1, 4, 2); }
         }
 
         public string Author

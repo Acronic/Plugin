@@ -22,7 +22,7 @@ namespace RadsAtom.Functions
                 try
                 {
                     // Check for ErrorDialogs!
-                    if (ErrorDialog.IsVisible && !ZetaDia.IsInGame)
+                    if (ErrorDialog.IsVisible && !ZetaDia.IsInGame && BotMain.IsRunning)
                     {
                         Logger.Log("Error Dialog found, closing dialog");
                         ErrorDialog.Click();
