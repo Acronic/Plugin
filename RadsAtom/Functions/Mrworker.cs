@@ -30,10 +30,16 @@ namespace RadsAtom.Functions
                             {
                                 KeyrunSwitch = false;
                                 Logger.Log("You got 5 stacks. Will load the profile to Key warden.");
+                                Logger.Log("Keyrun disabled.");
                                 Logger.Log("Loading: " + Settings.KeyrunProfile);
                                 MrProfile = Settings.KeyrunProfile;
                                 LoadProfile = true;
                                 IsExecute = true;
+                                while (!ZetaDia.Me.IsInTown)
+                                {
+                                    ZetaDia.Me.UseTownPortal();
+                                    Thread.Sleep(3500);
+                                }
                             }
                         }
                         catch
