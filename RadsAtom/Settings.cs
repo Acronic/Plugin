@@ -12,6 +12,7 @@ namespace RadsAtom
         public static double deathtrip = 2;
         public static double deathtrip2 = 3;
         public static string BackupProfile = "";
+        public static string KeyrunProfile = "";
         public static string settingsFile = "";
         public static bool ingamecheck = true;
         private static bool SavingSettings = false;

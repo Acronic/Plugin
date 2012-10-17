@@ -21,6 +21,27 @@ namespace RadsAtom.Functions
             {
                 try
                 {
+                    if (ZetaDia.IsInGame && KeyrunSwitch)
+                    {
+                        try
+                        {
+                            int NV = ZetaDia.Me.GetAllBuffs().Where(b => b.SNOId == 230745).First().StackCount;
+                            if (NV >= 5)
+                            {
+                                KeyrunSwitch = false;
+                                Logger.Log("You got 5 stacks. Will load the profile to Key warden.");
+                                Logger.Log("Loading: " + Settings.KeyrunProfile);
+                                MrProfile = Settings.KeyrunProfile;
+                                LoadProfile = true;
+                                IsExecute = true;
+                            }
+                        }
+                        catch
+                        {
+                        }
+                    }
+
+
                     // Check for ErrorDialogs!
                     if (ErrorDialog.IsVisible && !ZetaDia.IsInGame && BotMain.IsRunning)
                     {
@@ -155,6 +176,7 @@ namespace RadsAtom.Functions
         public static volatile bool IsExecute = false;
         public static volatile bool TakeABreakNOW = false;
         public static volatile bool BreakSettingsSet = false;
+        public static volatile bool KeyrunSwitch = false;
 
 
         public static string MrProfile = "";

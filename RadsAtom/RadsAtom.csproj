@@ -52,6 +52,7 @@
     <Compile Include="Functions\Authenticator.cs" />
     <Compile Include="Functions\AuthenticatorSettings.cs" />
     <Compile Include="Functions\AntiTownStuck.cs" />
+    <Compile Include="Functions\Keyrun.cs" />
     <Compile Include="Functions\Death.cs" />
     <Compile Include="Functions\DeathStatement.cs" />
     <Compile Include="Functions\Inactivitytimer.cs" />
